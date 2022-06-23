@@ -1,0 +1,286 @@
+Libraries and data uploads
+```{r}
+library(tidyverse)
+library(shiny)
+library(shinydashboard)
+library(tigris)
+library(tidycensus)
+library(sf)
+library(ggplot2)
+library(ggiraph)
+library(scales)
+library(DT)
+
+options(tigris_use_cache = TRUE)
+
+us_value <- get_acs(
+  geography = "state",
+  variables = "B25077_001",
+  year = 2019,
+  survey = "acs1",
+  geometry = TRUE,
+  resolution = "20m"
+)%>%shift_geometry()%>%
+  dplyr::select(.,-c("estimate","moe"))
+
+df_npa = read_csv("./Nutrition__Physical_Activity__and_Obesity_-_Behavioral_Risk_Factor_Surveillance_System.csv")%>% 
+  select_if(~!all(is.na(.)))%>%
+  rename(demographic = StratificationCategory1, Year = YearEnd, Age = `Age(years)`)%>%
+  mutate(demographic = if_else(grepl("Age \\(years\\)" ,demographic), "Age", as.character(demographic)))
+
+df_map = merge(us_value,df_npa, by.x="NAME",by.y ="LocationDesc" )%>%
+  mutate(tooltip = paste(NAME, paste(Data_Value,"%",sep=""), sep = ": "))
+
+df_cdi = read_csv("./U.S._Chronic_Disease_Indicators__CDI_.csv")%>% select_if(~!all(is.na(.)))
+
+
+trend = read_csv("./Obesity vs Diet and Exercise.csv")
+
+
+
+```
+
+BASIC EDA OF THE DATA
+
+```{r}
+str(df_npa)
+head(df_npa)
+summary(df_npa)
+```
+
+
+EDA and Graphs
+```{r}
+df_npa%>%
+  filter(LocationDesc=="National",
+             Class =="Obesity / Weight Status"
+         ,QuestionID =="Q036"
+         ,!is.na(Education)
+      )%>%
+  mutate(Year = as.factor(Year))%>%
+  ggplot(aes(y = Data_Value, x = Year))+
+  geom_point(aes(color = Education))+
+  geom_line()+labs(y = "% Percent of Obesity", 
+           title = df_npa$Question[[1]])+
+      theme(plot.title = element_text(hjust = 0.5),legend.position="right")#+
+  #facet_wrap(~Stratification1)
+
+#unique(df_npa$Class)
+```
+
+```{r}
+gg = df_npa%>%
+  filter(LocationDesc=="National",
+         Class =="Obesity / Weight Status",
+         QuestionID =="Q036",
+         Year==2020,
+         !is.na(`Education`)
+         )%>%mutate(label_bar=paste(as.character(Data_Value),"%", sep = ""))%>%
+  select(`Education`,Data_Value,label_bar,Question)
+
+ggplot(gg ,aes(y = Data_Value, x = `Education`))+
+  geom_col(aes(fill =`Education`))+
+  geom_text(aes(label = label_bar), vjust = -0.5)+
+  labs(y = "% Percent of Obesity", 
+       title = gg$Question[[1]])+
+  theme(plot.title = element_text(hjust = 0.5),legend.position="none", axis.text.x = element_text(angle = -10))
+
+#ggsave(filename = "file", path = "file/path", width = 8, height = 5)
+
+```
+
+
+
+
+
+```{r}
+(df_cdi%>%
+  filter(
+    LocationDesc =="United States",
+    Topic =="Nutrition, Physical Activity, and Weight Status",
+    DataValueType =="Age-adjusted Prevalence",
+    StratificationCategory1=="Gender",
+    Question=="Obesity among adults aged >= 18 years",
+    ))%>%
+  arrange(YearEnd,QuestionID)%>%
+  
+  ggplot(aes(x=factor(YearEnd), y=DataValueAlt))+
+  geom_col(aes(fill = Stratification1),position = "dodge")+
+  labs(
+    title = paste("Percent Obesity Across", df_cdi$StratificationCategory1[[1]]),
+    x = "Year", y="Obesity % in Population", 
+    fill= df_cdi$StratificationCategory1[[1]])+
+  theme(plot.title = element_text(hjust = 0.5),legend.position="none")+
+  facet_grid(~Stratification1)
+
+
+unique((df_cdi%>%
+  filter(
+    Topic =="Nutrition, Physical Activity, and Weight Status",
+    Question == "Median daily frequency of fruit consumption among adults aged >= 18 years"  
+  )))
+
+unique(df_cdi$Topic)
+#ggsave("Obesity vs Year by Gender.png", width = 8, height = 5 )
+
+
+
+```
+
+BASIC EDA OF THE DATA
+```{r}
+colnames(df_npa)
+library(htmlwidgets)
+
+colnames(df_npa)
+```
+
+
+```{r}
+# 
+# df_npa = read_csv("C:/Users/kellyc/Desktop/NYCDSA/3-R Module/R Shiny Project/Nutrition__Physical_Activity__and_Obesity_-_Behavioral_Risk_Factor_Surveillance_System.csv")%>% 
+#   select_if(~!all(is.na(.)))%>%
+#   rename(demographic = StratificationCategory1, Year = YearEnd, Age = `Age(years)`)%>%
+#   mutate(demographic = if_else(grepl("Age \\(years\\)" ,demographic), "Age", as.character(demographic)))
+# 
+# df_npa$Stratification1%>%unique()
+
+# input<-list()
+# input$y = 2020
+input$d = "Age"
+
+df_npa%>%
+      filter(Class =="Obesity / Weight Status",
+             QuestionID =="Q036",
+             Year==2020,
+             demographic == "Age",
+             !is.na(demographic)
+      )%>%select(Year,LocationDesc,Data_Value,demographic,Stratification1)
+  
+  
+      mutate(label_bar=paste(as.character(Data_Value),"%", sep = ""))%>%
+      select(demographic,Data_Value,label_bar,Question,Stratification1)%>%
+      ggplot(aes(y = Data_Value, x = Stratification1))+
+      geom_col(aes(fill=Stratification1))+
+      geom_text(aes(label = label_bar), vjust = -0.5)+
+      labs(y = "% Percent of Obesity", 
+           title = df_npa$Question[[1]], x=df_npa$demographic[[1]])+
+      theme(plot.title = element_text(hjust = 0.5),legend.position="none")
+
+colnames(df_npa)
+```
+
+```{r}
+df_npa$demographic%>%na.omit()%>%unique()
+
+input$d = "Education"
+unique(filter(df_npa,demographic=="Race/Ethnicity",
+           QuestionID=="Q036", 
+           !is.na(demographic)
+           )$Stratification1)
+
+```
+```{r}
+ df_npa%>%
+    filter(
+      Year==2020,
+      demographic=="Gender",
+      Stratification1=="Female",
+      QuestionID=="Q036",
+      !is.na(demographic))%>%
+    select(Year,LocationDesc,Data_Value,demographic,Stratification1)%>%
+    rename(States=LocationDesc)
+```
+```{r}
+df_npa%>%count(Total)
+```
+
+
+```{r}
+trend$Q047
+
+#na.omit(
+  df_npa%>%
+  filter(Total == "Total",
+         LocationDesc =="National",
+         !grepl("overweight",Question))%>%
+  pivot_wider(
+           names_from = QuestionID,
+           values_from = Data_Value)%>%
+  arrange(Year)
+  #%>%select(Year,Q046))
+
+year = data.frame(Year = c(2011:2020))
+
+for i in colnames()
+trend = merge(left_join(year,na.omit(df_npa%>%
+  filter(Total == "Total",
+         LocationDesc =="National",
+         !grepl("overweight",Question))%>%
+  pivot_wider(
+           names_from = QuestionID,
+           values_from = Data_Value)%>%
+  arrange(Year)%>%select(Year,Q019)), by = "Year"),trend, on = Year)
+
+
+write_csv(trend,"Obesity vs Diet and Exercise.csv")
+  
+```
+
+
+```{r}
+df_npa%>%
+  filter(Total == "Total",
+         LocationDesc =="National",
+         !grepl("overweight",Question))%>%
+  pivot_wider(
+           names_from = QuestionID,
+           values_from = Data_Value)%>%
+  arrange(Year)
+
+
+str(trend)
+
+```
+```{r}
+#Create data frame to graph trends Dietary and Physical Activity Trend vs Obesity
+
+trend_maker = function(df){
+  trend = data.frame(cap = c(rep(NA,527)))
+  for (cl in unique(df$Class)){
+    df1 = df%>%
+      filter(LocationDesc!= "National",
+             Class == cl,
+             demographic =="Total")
+    
+    for (ques in unique(df1$Question)){
+      d=case_when(
+        stri_detect_fixed(ques,"obesity")~ "OBS",
+        stri_detect_fixed(ques,"300")~ "LongAero",
+        stri_detect_fixed(ques,"aerobic physical activity and engage in muscle-strengthening")~ "COMBO",
+        stri_detect_fixed(ques,"leisure-time")~ "LESTIME",
+        stri_detect_fixed(ques," 75 minutes a week of vigorous-intensity aerobic activity (or an equivalent combination)")~ "ShortAero",
+        stri_detect_fixed(ques,"Percent of adults who engage in muscle-strengthening activities on 2 or more days a week")~ "STRENGTH",
+        stri_detect_fixed(ques,"fruit")~ "FRUIT",
+        stri_detect_fixed(ques,"vegetables")~ "VEGGIE",
+        TRUE ~ "CRAP")
+      
+     df2 = df1%>%
+      filter(Question==ques)%>%
+      mutate(d = Data_Value)%>%select(Year,d,LocationDesc)
+     print(length(df2$Year))
+     
+     max_length = max(c(length(df2$Year),527))
+     
+    trend[c(d,paste(d,"Year", sep = "_"),"STATE")] = c(c(df2$d , rep(NA,max_length - length(df2$Year))),c(df2$Year, rep(NA,max_length - length(df2$Year))),c(df2$LocationDesc, rep(NA,max_length - length(df2$Year))))
+   
+    }
+  }
+return(trend)
+
+}
+
+
+trend_maker(df_npa) ->trend
+```
+
