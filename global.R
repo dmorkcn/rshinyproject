@@ -27,7 +27,7 @@ us_value <- get_acs(
 
 #Create a data frame with the obesity data
 #------------------------------------------
-df_npa = read_csv("../Nutrition__Physical_Activity__and_Obesity_-_Behavioral_Risk_Factor_Surveillance_System.csv")%>% 
+df_npa = read_csv("./Nutrition__Physical_Activity__and_Obesity_-_Behavioral_Risk_Factor_Surveillance_System.csv")%>% 
   select_if(~!all(is.na(.)))%>%
   rename(demographic = StratificationCategory1, Year = YearEnd, Age = `Age(years)`)%>%
   mutate(demographic = if_else(grepl("Age \\(years\\)" ,demographic), "Age", as.character(demographic)))

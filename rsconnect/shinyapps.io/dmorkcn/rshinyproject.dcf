@@ -1,0 +1,14 @@
+name: rshinyproject
+title: rshinyproject
+username:
+account: dmorkcn
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6570671
+bundleId: 6055572
+url: https://dmorkcn.shinyapps.io/rshinyproject/
+when: 1656531521.04791
+lastSyncTime: 1656531521.04791
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData|helpers.R|PROJECT File.Rmd|README.md

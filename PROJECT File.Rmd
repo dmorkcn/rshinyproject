@@ -227,6 +227,104 @@ write_csv(trend,"Obesity vs Diet and Exercise.csv")
   
 ```
 
+```{r}
+les = df_npa%>%
+  filter(Topic=="Physical Activity - Behavior",
+         Question =="Percent of adults who achieve at least 150 minutes a week of moderate-intensity aerobic physical activity or 75 minutes a week of vigorous-intensity aerobic activity (or an equivalent combination)",
+         LocationDesc != "Puerto Rico",
+         demographic =="Total")%>%select(Year,LocationDesc,Data_Value)
+
+
+
+ inner_join(les,obs, by = c("Year","LocationDesc"))
+
+ ggplot(data = inner_join(les,obs, by = c("Year","LocationDesc")),aes(y=Data_Value.y, x=Data_Value.x))+
+  geom_point()+
+   geom_smooth(method=lm)+
+    labs(title = "Obesity vs Exercise",
+         x = "Percent meeting CDC weekly exercise recommendations",
+         y="Percent with obesity")
+
+ ggsave("obesity vs Combo.png",width = 8, height = 5)
+
+```
+
+
+```{r}
+les = df_npa%>%
+  filter(Topic=="Physical Activity - Behavior",
+         Question =="Percent of adults who engage in no leisure-time physical activity",
+         LocationDesc != "Puerto Rico",
+         demographic =="Total")%>%select(Year,LocationDesc,Data_Value)
+
+obs = df_npa%>%
+  filter(Topic=="Obesity / Weight Status",
+         Question =="Percent of adults aged 18 years and older who have obesity",
+         LocationDesc != "Puerto Rico",
+         demographic =="Total")%>%select(Year,LocationDesc,Data_Value)
+
+ggplot(data = inner_join(les,obs, by = c("Year","LocationDesc")),aes(y=Data_Value.y, x=(100-Data_Value.x)))+
+  geom_point()+
+   geom_smooth(method=lm)+
+    labs(title = "Obesity vs General Leisure Time Activity",
+         x = "Percent of people active during leisure time.",
+         y="Percent of people with obesity")
+  
+  
+ggsave("obesity vs activity.png",width = 8, height = 5)
+```
+
+
+```{r}
+les = df_npa%>%
+  filter(Question =="Percent of adults who report consuming fruit less than one time daily",
+         LocationDesc != "Puerto Rico",
+         demographic =="Total")%>%select(Year,LocationDesc,Data_Value)
+
+
+
+ inner_join(les,obs, by = c("Year","LocationDesc"))
+
+ ggplot(data = inner_join(les,obs, by = c("Year","LocationDesc")),aes(y=Data_Value.y, x=100-Data_Value.x))+
+  geom_point()+
+   geom_smooth(method=lm)+
+    labs(title = "Obesity vs Fruit Consumption",
+         x = "Percent eating fruits daily",
+         y="Percent with obesity")
+
+ ggsave("obesity vs fruit.png",width = 8, height = 5)
+```
+
+
+```{r}
+les = df_npa%>%
+  filter(Question =="Percent of adults who report consuming vegetables less than one time daily",
+         LocationDesc != "Puerto Rico",
+         demographic =="Total")%>%select(Year,LocationDesc,Data_Value)
+
+
+
+ inner_join(les,obs, by = c("Year","LocationDesc"))
+
+ ggplot(data = inner_join(les,obs, by = c("Year","LocationDesc")),aes(y=Data_Value.y, x=100-Data_Value.x))+
+  geom_point()+
+   geom_smooth(method=lm)+
+    labs(title = "Obesity vs Vegetables Consumption",
+         x = "Percent eating Vegetables daily",
+         y="Percent with obesity")
+ 
+ inner_join(les,obs, by = c("Year","LocationDesc"))$Data_Value.y
+ 
+ 
+ ggsave("obesity vs veggies.png",width = 8, height = 5)
+```
+
+
+```{r}
+```
+```{r}
+
+unique(df_npa$Question)
 
 ```{r}
 df_npa%>%
@@ -282,5 +380,7 @@ return(trend)
 
 
 trend_maker(df_npa) ->trend
+
+
 ```
 

@@ -2,11 +2,12 @@ dashboardPage(
   dashboardHeader( title='Health Crisis: Obesity'),
   dashboardSidebar(
     sidebarUserPanel("Corey Kelly",
-                     image = "./img/NYCDSA.png"),
+                     image = "./img/NYCDSA 1.png"),
     sidebarMenu(
       menuItem("Home", tabName = "home", icon = icon("home")),
-      menuItem("Across America", tabName = "US", icon = icon("flag-usa")),
-      menuItem("States", tabName = "state", icon = icon("database"))
+      menuItem("National Demographics", tabName = "US", icon = icon("flag-usa")),
+      menuItem("State Demographics", tabName = "state", icon = icon("chart-bar")),
+      menuItem("National Trends", tabName = "trends", icon = icon("chart-line"))
     )
     ),
   dashboardBody(
@@ -107,35 +108,25 @@ dashboardPage(
                            girafeOutput("states")))
                 
               ))
-              # fluidRow(
-              #   box(width = 4,solidHeader = T,status = "primary", align="center",
-              #     selectizeInput(
-              #       inputId = "yr",
-              #       label = h3("Year"),
-              #       choices = unique(sort(na.omit(df_map$Year))),
-              #       selected=unique(sort(na.omit(df_map$Year))[1])
-              #       ),
-              #     
-              #     selectizeInput(
-              #       inputId = "d",
-              #       label = h3("Demographic"),
-              #       choices = unique(sort(na.omit(df_map$demographic))),
-              #       selected=unique(sort(na.omit(df_map$demographic))[1])
-              #       ),
-              #     
-              # 
-              #     selectizeInput(
-              #       inputId = "state",
-              #       label = h3("State"),
-              #       choices = unique(sort(na.omit(df_map$NAME))),
-              #       selected=unique(sort(na.omit(df_map$NAME))[1]))
-              #       ),
-              #   
-              #   box(width = NULL,solidHeader = T,status = "primary",
-              #       title = "Percent of U.S. Adults that are Obese Acrross Demographics",
-              #         DTOutput("table")
-              #       )
-              #   )
+             
+      ),
+      tabItem(tabName = "trends",
+              image = ".img/NYCDSA 1.png",
+              fluidRow(box(width = NULL,solidHeader = T,status = "primary",
+                           align="center",title = "Percent of U.S. Adults that 
+                         are Obese vs Dietary Factors 2011-2020",
+                           column(width = 6, imageOutput("fruit")),
+                           column(width = 6, imageOutput("veg")))),
+              fluidRow(box(width = NULL,solidHeader = T,status = "primary",
+                           align="center",title = "Percent of U.S. Adults that 
+                         are Obese vs Activity Factors 2011-2020",
+                           column(width = 6,imageOutput("combo")),
+                           column(width = 6,imageOutput("act")))
+             
+                
+                   
+                )
+        
       )
                 
              

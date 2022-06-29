@@ -172,8 +172,43 @@ output$race = renderPlot(
     theme(plot.title = element_text(hjust = 0.5),legend.position="none")
 )
 
+output$fruit = renderImage(
+    list(src = "www/img/obesityvsfruit.png",
+    contentType = "image/png",
+    width = 600,
+    height = 400,
+    alt = "fruit"),
+    deleteFile = F
+)
+
+output$combo = renderImage(
+  list(src = "www/img/obesity_vs_combo.png",
+       contentType = "image/png",
+       width = 600,
+       height = 400,
+       alt = "combo"),
+  deleteFile = F
+)
+output$act = renderImage(
+  list(src = "www/img/obesity_vs_activity.png",
+       contentType = "image/png",
+       width = 600,
+       height = 400,
+       alt = "act"),
+  deleteFile = F
+)
   
-    
+ 
+output$veg = renderImage(
+  
+  list(src = "www/img/obesity vs veggies.png",
+       contentType = "image/png",
+       width = 600,
+       height = 400,
+       alt = "veg"),
+  deleteFile = F
+)
+   
 }
 
 
