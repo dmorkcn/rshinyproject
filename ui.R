@@ -31,11 +31,18 @@ dashboardPage(
                          healthcare organizations, and pharmaceutical companies more effectively target 
                          resources and get an increased ROI.")),
                 fluidRow(
-                  column(12,
+                  column(6,
                          box(width = NULL, status = "primary", solidHeader = T, 
                              align="center",title = "Percent of U.S. Adults that are Obese 2011-2020",
                                 plotOutput("by_year", width = "75%"))
-                         )
+                             
+                  ),
+                  column(6,
+                    box(width = NULL, status = "primary", solidHeader = T, 
+                        align="center",title = "Percent of U.S. Men and Women that are Obese 2011-2020",
+                        plotOutput("by_gender", width = "75%"))
+                  )
+                         
                   )
                 )
       ),

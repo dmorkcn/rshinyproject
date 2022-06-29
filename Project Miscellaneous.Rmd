@@ -417,26 +417,4 @@ trend_maker(df_npa) ->trend
 
 
 ```
-```{r}
-df_npa%>%
-  filter(
-    LocationDesc =="National",
-    demographic =="Gender",
-    QuestionID == "Q036"
-    )%>%
-ggplot(aes(x = as.character(Year), y = Data_Value ))+
-  geom_col(aes(fill = Stratification1),position  = "dodge")+
-  facet_grid(~Stratification1)+
-  labs(
-    title = "Percent Obesity Across Gender",
-    x = "Year", y="Obesity % in Population")+
-  theme(plot.title = element_text(hjust = 0.5),legend.position="none")
-
-
-ggsave("Obesity vs Year by Gender.png",width = 8, height = 5)
-
-
-
-
-```
 

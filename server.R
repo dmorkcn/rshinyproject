@@ -1,25 +1,45 @@
 function(input, output, session) {
 
-#Home Page Plot
+#Home Page Total Obesity Plot
 #--------------------------------------------
   output$by_year <- renderPlot(
     df_npa%>%
       filter(
         LocationDesc == "National",
         QuestionID =="Q036",
-        demographic ==	Total
+        demographic ==	"Total"
       )%>%ggplot(.,aes(x = as.Date(paste(as.character(Year),"-01-01",sep="")), y=Data_Value))+
-      geom_point(size=1.75)+
-      geom_line(aes(color=Topic, linetype = Topic),size=1.25)+
+      geom_point(size=2)+
+      geom_line(color = "Red",size = 1)+#aes(color=Topic, linetype = Topic),size=1.25)+
       labs(x ="Years", y = "% of Population")+
       theme(plot.title = element_text(hjust = 0.5),
             legend.title = element_text(size = 10), 
             legend.text = element_text(size = 10), 
-            legend.position = "bottom")+
-      scale_color_manual(values = c("darkred"))
+            legend.position = "bottom")
+    #+
+      #scale_color_manual(values = c("darkred"))
     
   )
+  
+# Home Page Men and Women
+#--------------------------------------------
+output$by_gender = renderPlot(
+  df_npa%>%
+    filter(
+      LocationDesc =="National",
+      demographic =="Gender",
+      QuestionID == "Q036"
+    )%>%
+    ggplot(aes(x = as.character(Year), y = Data_Value ))+
+    geom_col(aes(fill = Stratification1),position  = "dodge")+
+    facet_grid(~Stratification1)+
+    labs(
+      title = "Percent Obesity Across Gender",
+      x = "Year", y="Obesity % in Population")+
+    theme(plot.title = element_text(hjust = 0.5),legend.position="none")
+)
 
+  
   
 #Observe the Demographic Input Selected  
 #--------------------------------------------
@@ -82,23 +102,6 @@ observe({
     x
   })
   
-
-  
-  
-  
-output$table <- renderDataTable({
-  df_npa%>%
-    filter(
-      Year==input$yr,
-      demographic==input$d,
-      Stratification1==input$ui2,
-      QuestionID=="Q036",
-      #LocationDesc==input$state,
-      !is.na(demographic)
-      )%>%
-    select(Year,LocationDesc,Data_Value,demographic,Stratification1)%>%
-    rename(States=LocationDesc)
-  })
 
 
 #A map of the each state that responds to select inputs. 
