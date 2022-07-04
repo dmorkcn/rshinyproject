@@ -10,14 +10,13 @@ function(input, output, session) {
         demographic ==	"Total"
       )%>%ggplot(.,aes(x = as.Date(paste(as.character(Year),"-01-01",sep="")), y=Data_Value))+
       geom_point(size=2)+
-      geom_line(color = "Red",size = 1)+#aes(color=Topic, linetype = Topic),size=1.25)+
+      geom_line(color = "Red",size = 1)+
       labs(x ="Years", y = "% of Population")+
       theme(plot.title = element_text(hjust = 0.5),
             legend.title = element_text(size = 10), 
             legend.text = element_text(size = 10), 
             legend.position = "bottom")
-    #+
-      #scale_color_manual(values = c("darkred"))
+  
     
   )
   

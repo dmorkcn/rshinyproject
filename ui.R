@@ -7,7 +7,7 @@ dashboardPage(
       menuItem("Home", tabName = "home", icon = icon("home")),
       menuItem("National Demographics", tabName = "US", icon = icon("flag-usa")),
       menuItem("State Demographics", tabName = "state", icon = icon("chart-bar")),
-      menuItem("National Trends", tabName = "trends", icon = icon("chart-line"))
+      menuItem("Obesity Trends", tabName = "trends", icon = icon("chart-line"))
     )
     ),
   dashboardBody(
@@ -49,7 +49,7 @@ dashboardPage(
 
       
       tabItem(tabName ='US',
-              fluidRow(
+              fluidPage(fluidRow(
                 column(width = 10,
                        box(width = NULL,solidHeader = T,status = "primary", 
                            align="center",title = "Percent of U.S. Adults that are Obese Across Demographics",
@@ -60,11 +60,17 @@ dashboardPage(
                        ),
                 column(width = 2,
                        box(width = NULL, solidHeader = T,
-                           selectizeInput(
+                           sliderInput(
                              inputId = "year",
                              label = h3("Year"),
-                             choices = unique(sort(na.omit(df_map$Year))),
-                             selected=unique(sort(na.omit(df_map$Year))[1]))
+                             min = min(unique(sort(na.omit(df_map$Year)))),
+                             max =max(unique(sort(na.omit(df_map$Year)))),
+                             value = max(unique(sort(na.omit(df_map$Year)))),
+                             step = 1,
+                             ticks = F
+                             # choices = unique(sort(na.omit(df_map$Year))),
+                             # selected=unique(sort(na.omit(df_map$Year))[1])
+                             )
                            ),
                        box(width = NULL,solidHeader = T,selectizeInput(
                              inputId = "demo",
@@ -79,7 +85,7 @@ dashboardPage(
                        )
                            )
                        )
-                )
+                ))
               ),
       
       
@@ -118,12 +124,22 @@ dashboardPage(
              
       ),
       tabItem(tabName = "trends",
-              image = ".img/NYCDSA 1.png",
+             fluidPage(h2("Dietary Trends"),
+              p(strong("These graphs represent the percent of people that consume 
+              at least one fruit or vegatable per day for a give region vs the 
+              percent of people affect by obesity in the same region.  Regions with higher percentages of 
+                       people that consume at least 1 fruit or vegetable tend to have lower rates of obesity.  
+                       Interestingly, percent of people eating fruit had a better correlation that vegetables.")),
               fluidRow(box(width = NULL,solidHeader = T,status = "primary",
                            align="center",title = "Percent of U.S. Adults that 
                          are Obese vs Dietary Factors 2011-2020",
                            column(width = 6, imageOutput("fruit")),
                            column(width = 6, imageOutput("veg")))),
+              h2("Physical Activity Trends"),
+              p(strong("The physical activities graphs I chose because they both were about physical movement
+                       but were different in that cdc weekly exercise recommendation was more quantitative at 
+                       150 minutes of aerobic exercise or an equivalent and the other was more qualitative 
+                       as just being activity during your leisure time.")),
               fluidRow(box(width = NULL,solidHeader = T,status = "primary",
                            align="center",title = "Percent of U.S. Adults that 
                          are Obese vs Activity Factors 2011-2020",
@@ -132,7 +148,7 @@ dashboardPage(
              
                 
                    
-                )
+                ))
         
       )
                 
